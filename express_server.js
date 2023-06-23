@@ -61,14 +61,21 @@ app.get("/u/:id", (req, res) => {
   res.redirect(longURL);
 });
 
-app.post("/urls/:id/delete", (req, res) => {
+app.post("/urls/:id/delete", (req, res) => { // delete urls
   const shortURL = req.params.id;
   delete urlDatabase[shortURL];
   res.redirect('/urls');
 });
 
-app.post("/urls/:id", (req, res) => {
+app.post("/urls/:id", (req, res) => { // edit long url
   const id = req.params.id;
   urlDatabase[id] = req.body.newURL;
   res.redirect('/urls');
+});
+
+app.post("/login", (req, res) => { 
+// set a cookie named username to the value submitted in the request body
+const username = req.body.username;
+res.cookie('username', username);
+res.redirect('/urls');
 });
