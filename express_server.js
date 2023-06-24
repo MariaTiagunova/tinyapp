@@ -80,6 +80,11 @@ res.cookie('username', username);
 res.redirect('/urls');
 });
 
+app.post("/logout", (req, res) => {
+  res.clearCookie('username');
+  res.redirect('/urls');
+});
+
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });
