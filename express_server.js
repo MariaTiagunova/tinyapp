@@ -103,7 +103,6 @@ app.post("/urls/:id", (req, res) => { // edit long url
 });
 
 app.post("/login", (req, res) => { 
-// set a cookie named username to the value submitted in the request body
 const userID = req.cookies["user_id"]
   const templateVars = { 
     user: users[userID]
@@ -144,6 +143,13 @@ app.post("/register", (req, res) => {
   console.log(users);
   res.redirect("/urls");
   });
+
+app.get("/login", (req, res) => {
+  const userID = req.cookies["user_id"]
+  const templateVars = { 
+    user: users[userID]}
+  res.render("login", templateVars);
+});
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
