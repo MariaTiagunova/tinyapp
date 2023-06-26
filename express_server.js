@@ -32,6 +32,13 @@ function generateRandomString() {
     }
   return randomString;
 };
+function getUserByEmail(email) {
+for (let user in users) {
+  if (users[user].email === email)
+  return users[user];
+};
+}
+
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -45,17 +52,7 @@ app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
-app.post("/register", (req, res) => {
-  const userID = generateRandomString();
-  users[userID] = {
-    id: userID,
-    email: req.body.email,
-    password: req.body.password,
-  };
-  res.cookie('user_id', userID)
-  console.log(users);
-  res.redirect("/urls");
-  });
+
 
 app.get("/urls", (req, res) => {
   const userID = req.cookies["user_id"]
@@ -125,6 +122,28 @@ app.get("/register", (req, res) => {
   }
   res.render("register", templateVars);
 });
+
+app.post("/register", (req, res) => {
+  const submittedEmail = req.body.email;
+  const submittedPassword = req.body.password;
+  // Checks if the e-mail already registered
+  if (getUserByEmail(submittedEmail)) {
+    return res.status(400).send("Email already registered")
+  };
+  // Checks if the e-mail or password are not empty strings
+  if (!submittedEmail || !submittedPassword) {
+    return res.status(400).send("Please include both a valid email and password");
+  };
+  const userID = generateRandomString();
+  users[userID] = {
+    id: userID,
+    email: req.body.email,
+    password: req.body.password,
+  };
+  res.cookie('user_id', userID)
+  console.log(users);
+  res.redirect("/urls");
+  });
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
