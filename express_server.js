@@ -104,6 +104,16 @@ app.post("/urls/:id", (req, res) => { // edit long url
 
 app.post("/login", (req, res) => { 
 const userID = req.cookies["user_id"]
+let submittedEmail = req.body.email;
+let submittedPassword = req.body.password;
+let user = getUserByEmail(submittedEmail);
+if (!user) {
+  return res.status(403).send("Email cannot be found")
+} 
+if (submittedPassword !== user.password) {
+  return res.status(403). send("Incorrect password")
+}
+res.cookie("user_id", user.id);
   const templateVars = { 
     user: users[userID]
   }
@@ -112,7 +122,7 @@ res.redirect('/urls');
 
 app.post("/logout", (req, res) => {
   res.clearCookie('user_id');
-  res.redirect('/urls');
+  res.redirect('/login');
 });
 
 app.get("/register", (req, res) => {
