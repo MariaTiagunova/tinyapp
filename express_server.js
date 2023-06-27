@@ -9,8 +9,14 @@ app.use(cookieParser());
 
 // Contains ids(short URLs) and corresponding long URLs
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b2xVn2: {
+    longURL: "http://www.lighthouselabs.ca",
+    userID: "aJ48lW",
+  },
+  i3BoGr: {
+    longURL: "https://www.google.ca",
+    userID: "aJ48lW",
+  },
 };
 
 // Contains user data
@@ -79,7 +85,7 @@ app.get("/urls/:id", (req, res) => {
   const templateVars = {
     user: users[userID],
     id: req.params.id,
-    longURL: urlDatabase[req.params.id]};
+    longURL: urlDatabase[req.params.id].longURL};
   res.render("urls_show", templateVars);
 });
 
@@ -97,7 +103,7 @@ app.get("/u/:id", (req, res) => {
   if (!urlDatabase[req.params.id]) {
     return res.status(404).send("Sorry, the short URL you entered is invalid.")
   } 
-  const longURL = urlDatabase[req.params.id]; // req.params.id = shortUrl from urlDatabase
+  const longURL = urlDatabase[req.params.id].longURL; // req.params.id = shortUrl from urlDatabase
   res.redirect(longURL);
 });
 
@@ -109,7 +115,7 @@ app.post("/urls/:id/delete", (req, res) => { // delete urls
 
 app.post("/urls/:id", (req, res) => { // edit long url
   const id = req.params.id;
-  urlDatabase[id] = req.body.newURL;
+  urlDatabase[id].longURL = req.body.newURL;
   res.redirect('/urls');
 });
 
