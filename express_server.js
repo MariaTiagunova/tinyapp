@@ -94,6 +94,9 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/u/:id", (req, res) => {
+  if (!urlDatabase[req.params.id]) {
+    return res.status(404).send("Sorry, the short URL you entered is invalid.")
+  } 
   const longURL = urlDatabase[req.params.id]; // req.params.id = shortUrl from urlDatabase
   res.redirect(longURL);
 });
