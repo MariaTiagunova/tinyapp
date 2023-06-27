@@ -63,11 +63,15 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
+  if (!req.cookies["user_id"]) { // if the user is not logged in, they will be redirected to the /login page
+    res.redirect("/login")
+  } else {
   const userID = req.cookies["user_id"];
   const templateVars = {
     user: users[userID]
   };
   res.render("urls_new", templateVars);
+  }
 });
 
 app.get("/urls/:id", (req, res) => {
@@ -80,9 +84,13 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
+  if (!req.cookies["user_id"]) { // if the user is not logged in, they will cannot shorten URLs
+    return res.send("Please log in to shorten URLs")
+  } else {
   const shortURL = generateRandomString();
   urlDatabase[shortURL] = req.body.longURL; // id-longURL saved to the urlDatabase
   res.redirect(`/urls/${shortURL}`); // redirection to /urls/:id
+  }
 });
 
 app.get("/u/:id", (req, res) => {
