@@ -136,12 +136,6 @@ app.get("/u/:id", (req, res) => {
   res.redirect(longURL);
 });
 
-app.post("/urls/:id/delete", (req, res) => { // delete urls
-  const shortURL = req.params.id;
-  delete urlDatabase[shortURL];
-  res.redirect('/urls');
-});
-
 app.post("/urls/:id", (req, res) => { // edit long url
   const userID = req.cookies["user_id"];
   const id = req.params.id;
@@ -153,12 +147,31 @@ app.post("/urls/:id", (req, res) => { // edit long url
   if (!userID) {
     return res.status(401).send("Please log in to edit URLs");
   }
-  // Check if the user owns the url
+  // Check if the user owns the URL
   if (urlDatabase[shortURL].userID !== userID) {
     return res.status(403).send("You do not have permission to edit this URL");
   }
-  // Update the logURL
+  // Update the longURL
   urlDatabase[id].longURL = req.body.newURL;
+  res.redirect('/urls');
+});
+
+app.post("/urls/:id/delete", (req, res) => { // delete urls
+  const userID = req.cookies["user_id"];
+  const shortURL = req.params.id;
+  // Check if the shortURL exists in the urlDatabase
+  if (!urlDatabase[id]) {
+    return res.status(404).send("URL not found");
+  }
+  // Check if the user is logged in 
+  if (!userID) {
+    return res.status(401).send("Please log in to edit URLs");
+  }
+  // Check if the user owns the URL
+  if (urlDatabase[shortURL].userID !== userID) {
+    return res.status(403).send("You do not have permission to edit this URL");
+  }
+  delete urlDatabase[shortURL];
   res.redirect('/urls');
 });
 
