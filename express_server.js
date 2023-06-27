@@ -122,10 +122,14 @@ app.post("/logout", (req, res) => {
 });
 
 app.get("/register", (req, res) => {
+  if (req.cookies["user_id"]) { // if the user is logged in, they will be redirected to the /urls page
+    res.redirect("/urls")
+  } else { // if user is not logged in, the registration page will be rendered
   const templateVars = {
     user: users[req.cookies["user_id"]]
   };
   res.render("register", templateVars);
+  }
 });
 
 app.post("/register", (req, res) => {
@@ -145,15 +149,20 @@ app.post("/register", (req, res) => {
     email: req.body.email,
     password: req.body.password,
   };
-  res.cookie('user_id', userID);
+  res.cookie('user_id', userID); // set cookie for user using their id
   res.redirect("/urls");
 });
 
 app.get("/login", (req, res) => {
+  if (req.cookies["user_id"]) { //if the user is logged in, they will be redirected to the /urls page
+    res.redirect("/urls")
+  } else { // if user is not logged in, the login page will be rendered
   const userID = req.cookies["user_id"];
   const templateVars = {
-    user: users[userID]};
+    user: users[userID]
+    };
   res.render("login", templateVars);
+  }
 });
 
 app.listen(PORT, () => {
