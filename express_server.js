@@ -103,6 +103,10 @@ app.get("/urls/:id", (req, res) => {
   if (!userID) {
     return res.status(401).send("Please log in to access your URLs");
   }
+  // Check if the URL exists in the database
+  if (!urlDatabase[shortURL]) {
+    return res.status(404).send("URL not found");
+  }
    // Check if the user owns the URL
    if (urlDatabase[shortURL].userID !== userID) {
     return res.status(403).send("You do not have permission to edit this URL");
@@ -139,7 +143,21 @@ app.post("/urls/:id/delete", (req, res) => { // delete urls
 });
 
 app.post("/urls/:id", (req, res) => { // edit long url
+  const userID = req.cookies["user_id"];
   const id = req.params.id;
+  // Check if the shortURL exists in the urlDatabase
+  if (!urlDatabase[id]) {
+    return res.status(404).send("URL not found");
+  }
+  // Check if the user is logged in 
+  if (!userID) {
+    return res.status(401).send("Please log in to edit URLs");
+  }
+  // Check if the user owns the url
+  if (urlDatabase[shortURL].userID !== userID) {
+    return res.status(403).send("You do not have permission to edit this URL");
+  }
+  // Update the logURL
   urlDatabase[id].longURL = req.body.newURL;
   res.redirect('/urls');
 });
