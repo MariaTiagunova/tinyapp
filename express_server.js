@@ -21,10 +21,10 @@ const urlDatabase = {
 
 // Contains user data
 const users = {
-  userRandomID: {
-    id: "userRandomID",
+  aJ48lW: {
+    id: "aJ48lW",
     email: "user@example.com",
-    password: "purple-monkey-dinosaur",
+    password: "12",
   },
 };
 
@@ -38,6 +38,7 @@ const generateRandomString = function() {
   }
   return randomString;
 };
+
 const getUserByEmail = function(email) {
   for (let user in users) {
     if (users[user].email === email)
@@ -45,6 +46,16 @@ const getUserByEmail = function(email) {
   }
 };
 
+// Returns only logged in user's URLs
+const urlsForUser = function(id) {
+  let userURLs = {};
+  for (const shortURL in urlDatabase) {
+    if (urlDatabase[shortURL].userID === id) {
+      userURLs[shortURL] = urlDatabase[shortURL]
+    }
+  }
+  return userURLs;
+}
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -62,9 +73,14 @@ app.get("/hello", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const userID = req.cookies["user_id"];
+  if (!userID) {
+    return res.status(401).send("Please log in to access your URLs");
+  }
+  const userURLs = urlsForUser(userID); //shows only user's URLs
   const templateVars = {
     user: users[userID],
-    urls: urlDatabase };
+    urls: userURLs
+  };
   res.render("urls_index", templateVars);
 });
 
@@ -82,6 +98,15 @@ app.get("/urls/new", (req, res) => {
 
 app.get("/urls/:id", (req, res) => {
   const userID = req.cookies["user_id"];
+  const shortURL = req.params.id;
+  // Check if the user is logged in
+  if (!userID) {
+    return res.status(401).send("Please log in to access your URLs");
+  }
+   // Check if the user owns the URL
+   if (urlDatabase[shortURL].userID !== userID) {
+    return res.status(403).send("You do not have permission to edit this URL");
+  }
   const templateVars = {
     user: users[userID],
     id: req.params.id,
