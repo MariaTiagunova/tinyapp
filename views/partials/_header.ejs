@@ -16,16 +16,18 @@
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
         <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
-        <a class="nav-item nav-link" href="/register">Register</a>
-        <% if(!user){ %>
-          <a class="nav-item nav-link" href="/login">Log In</a>
-        <% } %>
       </div>
+    </div>
+    <div class="navbar-nav my-2 my-lg-0">
+      <% if(!user){ %>
+          <a class="nav-item nav-link" href="/register">Register</a>
+          <a class="nav-item nav-link" href="/login">Login</a>
+        <% } %>
     </div>
     <% if(user){ %>
       <form method="POST" action="/logout">
-        <div class="form-group mb-2">
-          <label>Logged In As: <%= user.email %></label>
+        <div class="form-inline my-2 my-lg-0">
+          <label class="mr-2">Logged In As: <%= user.email %> </label>
           <button type="submit" style="background-color:transparent; border-color:darkslategray; color:darkslategray" class="btn btn-primary">Logout</button>
         </div>
       </form>
