@@ -67,13 +67,13 @@ app.get("/urls", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
   if (!req.session.user_id) { // if the user is not logged in, they will be redirected to the /login page
-    res.redirect("/login")
+    res.redirect("/login");
   } else {
-  const userID = req.session.user_id;
-  const templateVars = {
-    user: users[userID]
-  };
-  res.render("urls_new", templateVars);
+    const userID = req.session.user_id;
+    const templateVars = {
+      user: users[userID]
+    };
+    res.render("urls_new", templateVars);
   }
 });
 
@@ -88,8 +88,8 @@ app.get("/urls/:id", (req, res) => {
   if (!urlDatabase[shortURL]) {
     return res.status(404).send("URL not found");
   }
-   // Check if the user owns the URL
-   if (urlDatabase[shortURL].userID !== userID) {
+  // Check if the user owns the URL
+  if (urlDatabase[shortURL].userID !== userID) {
     return res.status(403).send("You do not have permission to edit this URL");
   }
   const templateVars = {
@@ -102,24 +102,24 @@ app.get("/urls/:id", (req, res) => {
 app.post("/urls", (req, res) => {
   const userID = req.session.user_id;
   if (!userID) { // if the user is not logged in, they will cannot shorten URLs
-    return res.send("Please log in to shorten URLs")
+    return res.send("Please log in to shorten URLs");
   } else {
-  const shortURL = generateRandomString(6);
-  if (!req.body.longURL) {
-    return res.send("Please enter a valid URL");
-  }
-  urlDatabase[shortURL] = {
-    longURL: req.body.longURL,
-    userID: userID
-  };
-  res.redirect(`/urls/${shortURL}`); // redirection to /urls/:id
+    const shortURL = generateRandomString(6);
+    if (!req.body.longURL) {
+      return res.send("Please enter a valid URL");
+    }
+    urlDatabase[shortURL] = {
+      longURL: req.body.longURL,
+      userID: userID
+    };
+    res.redirect(`/urls/${shortURL}`); // redirection to /urls/:id
   }
 });
 
 app.get("/u/:id", (req, res) => {
   if (!urlDatabase[req.params.id]) {
-    return res.status(404).send("Sorry, the short URL you entered is invalid.")
-  } 
+    return res.status(404).send("Sorry, the short URL you entered is invalid.");
+  }
   const longURL = urlDatabase[req.params.id].longURL; // req.params.id = shortUrl from urlDatabase
   res.redirect(longURL);
 });
@@ -132,7 +132,7 @@ app.post("/urls/:id", (req, res) => { // edit long url
   if (!savedURL) {
     return res.status(404).send("URL not found");
   }
-  // Check if the user is logged in 
+  // Check if the user is logged in
   if (!userID) {
     return res.status(401).send("Please log in to edit URLs");
   }
@@ -155,7 +155,7 @@ app.post("/urls/:id/delete", (req, res) => { // delete urls
   if (!urlDatabase[shortURL]) {
     return res.status(404).send("URL not found");
   }
-  // Check if the user is logged in 
+  // Check if the user is logged in
   if (!userID) {
     return res.status(401).send("Please log in to edit URLs");
   }
@@ -188,12 +188,12 @@ app.post("/logout", (req, res) => {
 
 app.get("/register", (req, res) => {
   if (req.session.user_id) { // if the user is logged in, they will be redirected to the /urls page
-    res.redirect("/urls")
+    res.redirect("/urls");
   } else { // if user is not logged in, the registration page will be rendered
-  const templateVars = {
-    user: users[req.session.user_id]
-  };
-  res.render("register", templateVars);
+    const templateVars = {
+      user: users[req.session.user_id]
+    };
+    res.render("register", templateVars);
   }
 });
 
@@ -220,13 +220,13 @@ app.post("/register", (req, res) => {
 
 app.get("/login", (req, res) => {
   if (req.session.user_id) { //if the user is logged in, they will be redirected to the /urls page
-    res.redirect("/urls")
+    res.redirect("/urls");
   } else { // if user is not logged in, the login page will be rendered
-  const userID = req.session.user_id;
-  const templateVars = {
-    user: users[userID]
+    const userID = req.session.user_id;
+    const templateVars = {
+      user: users[userID]
     };
-  res.render("login", templateVars);
+    res.render("login", templateVars);
   }
 });
 

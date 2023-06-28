@@ -21,10 +21,10 @@ const urlsForUser = function(id, database) {
   let userURLs = {};
   for (const shortURL in database) {
     if (database[shortURL].userID === id) {
-      userURLs[shortURL] = database[shortURL]
+      userURLs[shortURL] = database[shortURL];
     }
   }
   return userURLs;
-}
+};
 
 module.exports = { getUserByEmail, generateRandomString, urlsForUser };
