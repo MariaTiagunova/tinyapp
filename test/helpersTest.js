@@ -1,6 +1,6 @@
 const { assert } = require('chai');
 
-const { getUserByEmail } = require('../helpers.js');
+const { getUserByEmail, generateRandomString } = require('../helpers.js');
 
 const testUsers = {
   "userRandomID": {
@@ -24,5 +24,19 @@ describe('getUserByEmail', function() {
   it('should return undefined for a non-existent email', function() {
     const user = getUserByEmail("user10@example.com", testUsers);
     assert.strictEqual(user, undefined);
+  });
+});
+
+describe('generateRandomString', function() {
+  it('should return a string of a passed-in number of characters', function() {
+    const randomStringLength = generateRandomString(10).length;
+    const expectedOutput = 10;
+    assert.equal(randomStringLength, expectedOutput);
+  });
+
+  it('should return different strings when called multiple times', function() {
+    const firstRandomString = generateRandomString(6);
+    const secondRandomString = generateRandomString(6);
+    assert.notEqual(firstRandomString, secondRandomString);
   });
 });
