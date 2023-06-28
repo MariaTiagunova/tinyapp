@@ -16,4 +16,15 @@ const generateRandomString = function(length) {
   return randomString;
 };
 
-module.exports = { getUserByEmail, generateRandomString };
+// Returns only logged in user's URLs
+const urlsForUser = function(id, database) {
+  let userURLs = {};
+  for (const shortURL in database) {
+    if (database[shortURL].userID === id) {
+      userURLs[shortURL] = database[shortURL]
+    }
+  }
+  return userURLs;
+}
+
+module.exports = { getUserByEmail, generateRandomString, urlsForUser };

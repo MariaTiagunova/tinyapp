@@ -4,7 +4,7 @@ const PORT = 8080; // default port
 const cookieSession = require('cookie-session');
 const bcrypt = require("bcryptjs");
 
-const { getUserByEmail, generateRandomString } = require('./helpers');
+const { getUserByEmail, generateRandomString, urlsForUser } = require('./helpers');
 
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
@@ -36,16 +36,7 @@ const users = {
   },
 };
 
-// Returns only logged in user's URLs
-const urlsForUser = function(id) {
-  let userURLs = {};
-  for (const shortURL in urlDatabase) {
-    if (urlDatabase[shortURL].userID === id) {
-      userURLs[shortURL] = urlDatabase[shortURL]
-    }
-  }
-  return userURLs;
-}
+
 
 app.get("/", (req, res) => {
   res.send("Hello!");
@@ -66,7 +57,7 @@ app.get("/urls", (req, res) => {
   if (!userID) {
     return res.status(401).send("Please log in to access your URLs");
   }
-  const userURLs = urlsForUser(userID); //shows only user's URLs
+  const userURLs = urlsForUser(userID, urlDatabase); //shows only user's URLs
   const templateVars = {
     user: users[userID],
     urls: userURLs
