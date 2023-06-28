@@ -120,11 +120,18 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  if (!req.cookies["user_id"]) { // if the user is not logged in, they will cannot shorten URLs
+  const userID = req.cookies["user_id"];
+  if (!userID) { // if the user is not logged in, they will cannot shorten URLs
     return res.send("Please log in to shorten URLs")
   } else {
   const shortURL = generateRandomString();
-  urlDatabase[shortURL] = req.body.longURL; // id-longURL saved to the urlDatabase
+  if (!req.body.longURL) {
+    return res.send("Please enter a valid URL");
+  }
+  urlDatabase[shortURL] = {
+    longURL: req.body.longURL,
+    userID: userID
+  };
   res.redirect(`/urls/${shortURL}`); // redirection to /urls/:id
   }
 });
@@ -139,9 +146,10 @@ app.get("/u/:id", (req, res) => {
 
 app.post("/urls/:id", (req, res) => { // edit long url
   const userID = req.cookies["user_id"];
-  const id = req.params.id;
+  const shortURL = req.params.id;
+  const savedURL = urlDatabase[shortURL];
   // Check if the shortURL exists in the urlDatabase
-  if (!urlDatabase[id]) {
+  if (!savedURL) {
     return res.status(404).send("URL not found");
   }
   // Check if the user is logged in 
@@ -149,11 +157,14 @@ app.post("/urls/:id", (req, res) => { // edit long url
     return res.status(401).send("Please log in to edit URLs");
   }
   // Check if the user owns the URL
-  if (urlDatabase[shortURL].userID !== userID) {
+  if (savedURL.userID !== userID) {
     return res.status(403).send("You do not have permission to edit this URL");
   }
+  if (!req.body.newURL) {
+    return res.send("Please enter a valid URL");
+  }
   // Update the longURL
-  urlDatabase[id].longURL = req.body.newURL;
+  urlDatabase[shortURL].longURL = req.body.newURL;
   res.redirect('/urls');
 });
 
@@ -161,7 +172,7 @@ app.post("/urls/:id/delete", (req, res) => { // delete urls
   const userID = req.cookies["user_id"];
   const shortURL = req.params.id;
   // Check if the shortURL exists in the urlDatabase
-  if (!urlDatabase[id]) {
+  if (!urlDatabase[shortURL]) {
     return res.status(404).send("URL not found");
   }
   // Check if the user is logged in 
