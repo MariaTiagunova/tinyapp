@@ -1,12 +1,17 @@
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port
-const cookieParser = require('cookie-parser');
+const cookieSession = require('cookie-session');
 const bcrypt = require("bcryptjs");
 
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+app.use(cookieSession({
+  name: 'session',
+  keys: ['catcus'],
+  //Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}));
 
 // Contains ids(short URLs) and corresponding long URLs
 const urlDatabase = {
@@ -73,7 +78,7 @@ app.get("/hello", (req, res) => {
 
 
 app.get("/urls", (req, res) => {
-  const userID = req.cookies["user_id"];
+  const userID = req.session.user_id;
   if (!userID) {
     return res.status(401).send("Please log in to access your URLs");
   }
@@ -86,10 +91,10 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/new", (req, res) => {
-  if (!req.cookies["user_id"]) { // if the user is not logged in, they will be redirected to the /login page
+  if (!req.session.user_id) { // if the user is not logged in, they will be redirected to the /login page
     res.redirect("/login")
   } else {
-  const userID = req.cookies["user_id"];
+  const userID = req.session.user_id;
   const templateVars = {
     user: users[userID]
   };
@@ -98,7 +103,7 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  const userID = req.cookies["user_id"];
+  const userID = req.session.user_id;
   const shortURL = req.params.id;
   // Check if the user is logged in
   if (!userID) {
@@ -120,7 +125,7 @@ app.get("/urls/:id", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  const userID = req.cookies["user_id"];
+  const userID = req.session.user_id;
   if (!userID) { // if the user is not logged in, they will cannot shorten URLs
     return res.send("Please log in to shorten URLs")
   } else {
@@ -145,7 +150,7 @@ app.get("/u/:id", (req, res) => {
 });
 
 app.post("/urls/:id", (req, res) => { // edit long url
-  const userID = req.cookies["user_id"];
+  const userID = req.session.user_id;
   const shortURL = req.params.id;
   const savedURL = urlDatabase[shortURL];
   // Check if the shortURL exists in the urlDatabase
@@ -169,7 +174,7 @@ app.post("/urls/:id", (req, res) => { // edit long url
 });
 
 app.post("/urls/:id/delete", (req, res) => { // delete urls
-  const userID = req.cookies["user_id"];
+  const userID = req.session.user_id;
   const shortURL = req.params.id;
   // Check if the shortURL exists in the urlDatabase
   if (!urlDatabase[shortURL]) {
@@ -197,21 +202,21 @@ app.post("/login", (req, res) => {
   if (!bcrypt.compareSync(submittedPassword, user.password)) {
     return res.status(403). send("Incorrect password");
   }
-  res.cookie("user_id", user.id);
+  req.session.user_id = user.id;
   res.redirect('/urls');
 });
 
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id');
+  req.session = null;
   res.redirect('/login');
 });
 
 app.get("/register", (req, res) => {
-  if (req.cookies["user_id"]) { // if the user is logged in, they will be redirected to the /urls page
+  if (req.session.user_id) { // if the user is logged in, they will be redirected to the /urls page
     res.redirect("/urls")
   } else { // if user is not logged in, the registration page will be rendered
   const templateVars = {
-    user: users[req.cookies["user_id"]]
+    user: users[req.session.user_id]
   };
   res.render("register", templateVars);
   }
@@ -234,15 +239,15 @@ app.post("/register", (req, res) => {
     email: submittedEmail,
     password: bcrypt.hashSync(submittedPassword, 10),
   };
-  res.cookie('user_id', userID); // set cookie for user using their id
+  req.session.user_id = userID; // set cookie for user using their id
   res.redirect("/urls");
 });
 
 app.get("/login", (req, res) => {
-  if (req.cookies["user_id"]) { //if the user is logged in, they will be redirected to the /urls page
+  if (req.session.user_id) { //if the user is logged in, they will be redirected to the /urls page
     res.redirect("/urls")
   } else { // if user is not logged in, the login page will be rendered
-  const userID = req.cookies["user_id"];
+  const userID = req.session.user_id;
   const templateVars = {
     user: users[userID]
     };
