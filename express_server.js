@@ -4,6 +4,8 @@ const PORT = 8080; // default port
 const cookieSession = require('cookie-session');
 const bcrypt = require("bcryptjs");
 
+const { getUserByEmail } = require('./helpers');
+
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({
@@ -43,13 +45,6 @@ const generateRandomString = function() {
     randomString += characters.charAt(randomIndex);
   }
   return randomString;
-};
-
-const getUserByEmail = function(email) {
-  for (let user in users) {
-    if (users[user].email === email)
-      return users[user];
-  }
 };
 
 // Returns only logged in user's URLs
@@ -195,7 +190,7 @@ app.post("/urls/:id/delete", (req, res) => { // delete urls
 app.post("/login", (req, res) => {
   let submittedEmail = req.body.email;
   let submittedPassword = req.body.password;
-  let user = getUserByEmail(submittedEmail);
+  let user = getUserByEmail(submittedEmail, users);
   if (!user) {
     return res.status(403).send("Email cannot be found");
   }
@@ -226,7 +221,7 @@ app.post("/register", (req, res) => {
   const submittedEmail = req.body.email;
   const submittedPassword = req.body.password;
   // Checks if the e-mail already registered
-  if (getUserByEmail(submittedEmail)) {
+  if (getUserByEmail(submittedEmail, users)) {
     return res.status(400).send("Email already registered");
   }
   // Checks if the e-mail or password are not empty strings
