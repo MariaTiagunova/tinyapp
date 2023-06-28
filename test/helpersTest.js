@@ -1,6 +1,6 @@
 const { assert } = require('chai');
 
-const { getUserByEmail, generateRandomString } = require('../helpers.js');
+const { getUserByEmail, generateRandomString, urlsForUser } = require('../helpers.js');
 
 const testUsers = {
   "userRandomID": {
@@ -12,6 +12,21 @@ const testUsers = {
     id: "user2RandomID",
     email: "user2@example.com",
     password: "dishwasher-funk"
+  }
+};
+
+const testUrlDatabase = {
+  "q63YKZ": {
+    longUrl: "http://www.lighthouselabs.ca",
+    userID: "userRandomID"
+  },
+  "9B1XKr": {
+    longUrl: "http://www.google.ca",
+    userID: "userRandomID"
+  },
+  "zB4A4g": {
+    longUrl: "https://www.digitalocean.com/",
+    userID: "user2RandomID"
   }
 };
 
@@ -40,3 +55,19 @@ describe('generateRandomString', function() {
     assert.notEqual(firstRandomString, secondRandomString);
   });
 });
+
+describe('urlsForUser', function() {
+  it('should return only the URLs which the logged-in user owns', function() {
+    const usersUrls = urlsForUser("userRandomID", testUrlDatabase);
+    const expectedOutput = { "q63YKZ": {
+      longUrl: "http://www.lighthouselabs.ca",
+      userID: "userRandomID"
+    },
+    "9B1XKr": {
+      longUrl: "http://www.google.ca",
+      userID: "userRandomID"
+    }
+    };
+    assert.deepEqual(usersUrls, expectedOutput);
+  })
+})
