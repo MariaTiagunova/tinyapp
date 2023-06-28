@@ -5,4 +5,15 @@ const getUserByEmail = function(email, database) {
   }
 };
 
-module.exports = { getUserByEmail };
+// Generates random string with 6 symbols for short URL id and User id
+const generateRandomString = function(length) {
+  let randomString = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    randomString += characters.charAt(randomIndex);
+  }
+  return randomString;
+};
+
+module.exports = { getUserByEmail, generateRandomString };

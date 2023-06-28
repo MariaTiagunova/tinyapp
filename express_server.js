@@ -4,7 +4,7 @@ const PORT = 8080; // default port
 const cookieSession = require('cookie-session');
 const bcrypt = require("bcryptjs");
 
-const { getUserByEmail } = require('./helpers');
+const { getUserByEmail, generateRandomString } = require('./helpers');
 
 app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: true }));
@@ -34,17 +34,6 @@ const users = {
     email: "user@example.com",
     password: "12",
   },
-};
-
-// Generates random string with 6 symbols for short URL id and User id
-const generateRandomString = function() {
-  let randomString = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  for (let i = 0; i < 6; i++) {
-    const randomIndex = Math.floor(Math.random() * characters.length);
-    randomString += characters.charAt(randomIndex);
-  }
-  return randomString;
 };
 
 // Returns only logged in user's URLs
@@ -124,7 +113,7 @@ app.post("/urls", (req, res) => {
   if (!userID) { // if the user is not logged in, they will cannot shorten URLs
     return res.send("Please log in to shorten URLs")
   } else {
-  const shortURL = generateRandomString();
+  const shortURL = generateRandomString(6);
   if (!req.body.longURL) {
     return res.send("Please enter a valid URL");
   }
@@ -228,7 +217,7 @@ app.post("/register", (req, res) => {
   if (!submittedEmail || !submittedPassword) {
     return res.status(400).send("Please include both a valid email and password");
   }
-  const userID = generateRandomString();
+  const userID = generateRandomString(6);
   users[userID] = {
     id: userID,
     email: submittedEmail,
